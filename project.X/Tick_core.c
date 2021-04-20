@@ -5,12 +5,14 @@
  *      The core timer increments once for every two ticks of SYSCLK
  *      For a SYSCLK of 80 MHz, the timer increments every 25 ns. 
  *      Because the timer is 32 bits, it rolls over every 
- *      232 × 25 ns = 107 s.
+ *      232 Ã— 25 ns = 107 s.
  * 
  * Author   Date            Comments
  * SH       28 Jan 2021     v1.0
  * SH       3 Feb 2021      v1.1    Add void delay_ticks(unsigned int tics) 
  * SH       25 March 2021   v2.0    Add function TickDiff() 
+ * SH       25 March 2021   v2.1    TickGet() returns 2*ticks 
+ *                                  delay_ticks() is in sysclk cycles
  **/
 #include <xc.h>
 #include <stdint.h>
@@ -34,7 +36,7 @@ void delay_us(unsigned int us)
 void delay_ticks(unsigned int tics)
 {
     // Convert microseconds us into how many clock ticks it will take
-    tics; // Core Timer updates every 2 ticks
+    tics = tics/2; // Core Timer updates every 2 ticks
 
     _CP0_SET_COUNT(0); // Set Core Timer count to 0
 
@@ -43,7 +45,7 @@ void delay_ticks(unsigned int tics)
 
 /* Gets the core clock timer current tick value */
 int64_t TickGet(void){
-    return _CP0_GET_COUNT();
+    return _CP0_GET_COUNT()*2;
 }
 
 /* Reset the core clock timer to 0 */
